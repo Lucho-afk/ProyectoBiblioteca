@@ -28,10 +28,13 @@ public class Copia {
 	private Status status;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "libro_id", referencedColumnName = "id", columnDefinition = "int")
+	@JoinColumn(name = "libro_id", referencedColumnName = "id", columnDefinition = "int", nullable = true)
 	@JsonIgnore
 	private Libro libro;
 	
+	@Column
+	@JsonIgnore
+	private boolean activo;
 
 	public int getId() {
 		return id;
@@ -60,6 +63,14 @@ public class Copia {
 	@Override
 	public String toString() {
 		return "Copia [id=" + id + ", status=" + status + ", libro=" + libro + "]";
+	}
+
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
 	}
 	
 	

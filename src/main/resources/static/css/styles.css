@@ -1,0 +1,21 @@
+.row {
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.formLector {
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.body__all {
+	background-color: #ffffff;
+	opacity: 1;
+	background-image: radial-gradient(ellipse farthest-corner at 4px 4px, #e0e0e0, #e0e0e0 50%
+		, #ffffff 50%);
+	background-size: 4px 4px;
+}

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -48,6 +51,7 @@ public class CopiaServiceImpl extends GenericServiceImpl<Copia, Integer> impleme
 	public int add(int id) {
 		Libro libro = libroService.get(id);
 		Copia copia= new Copia();
+		copia.setActivo(true);
 		Status status= statusService.get(1);
 		copia.setLibro(libro);
 		copia.setStatus(status);
@@ -81,6 +85,17 @@ public class CopiaServiceImpl extends GenericServiceImpl<Copia, Integer> impleme
 		rta.add(copia.getId()+"");
 		rta.add(copia.getLibro().getTitulo());
 		rta.add(copia.getStatus().getEstado());
+		return rta;
+	}
+
+	@Override
+	public List<String> statusCopia(int idLibro) {
+		Libro libro= libroService.get(idLibro);
+		List<String> rta= new ArrayList<>();
+		rta.add("Disponibles :" + libro.getLstCopias().stream().filter(i -> i.getStatus().getId()==1).collect(Collectors.toList()).size());
+		rta.add("Prestado :" + libro.getLstCopias().stream().filter(i -> i.getStatus().getId()==2).collect(Collectors.toList()).size());
+		rta.add("Retraso :" + libro.getLstCopias().stream().filter(i -> i.getStatus().getId()==3).collect(Collectors.toList()).size());
+		rta.add("Reparacion :" + libro.getLstCopias().stream().filter(i -> i.getStatus().getId()==4).collect(Collectors.toList()).size());
 		return rta;
 	}
 

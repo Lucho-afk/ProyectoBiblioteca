@@ -13,6 +13,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "lectores")
@@ -33,9 +35,12 @@ public class Lector {
 	private String direccion;
 	
 	@OneToOne
-	@JoinColumn(name="multa_id")
+	@JoinColumn(name="multa_id", nullable = true, unique = false)
 	private Multa multa;
 
+	@Column
+	@JsonIgnore
+	private boolean activo;
 
 	@OneToMany(mappedBy = "lector", cascade = CascadeType.ALL)
 	List<Prestamo> lstPrestamos = new ArrayList<>();
@@ -88,6 +93,14 @@ public class Lector {
 
 	public void setMulta(Multa multa) {
 		this.multa = multa;
+	}
+
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
 	}
 
 	

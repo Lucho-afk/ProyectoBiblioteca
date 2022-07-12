@@ -3,6 +3,7 @@ package com.sys.biblioteca.serviceImpl;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -125,6 +126,7 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 		if (aux.getMulta() != null) {
 			if (aux.getMulta().getFechaFinal().isBefore(LocalDate.now())) {
 				aux.setMulta(null);
+				
 				lectorRepository.save(aux);
 			}
 		}
@@ -148,6 +150,7 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 		Lector lector = lectorRepository.findById(idLector).get();
 		Libro libro = libroService.get(idLibro);
 		Prestamo prestamoNuevo = new Prestamo();
+		prestamoNuevo.setActivo(true);
 		prestamoNuevo.setInicio(LocalDate.now());
 		prestamoNuevo.setFin(LocalDate.now().plusDays(30));
 		if (lector.getLstPrestamos().size() < 3) {
@@ -169,23 +172,48 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 	}
 
 	@Override
-	public int devolver(int idLector, int idPrestamo) {
-		Lector lector = lectorRepository.findById(idLector).get();
+	public int devolver(String idLector, String idPrestamo) {
+		int idLec= Integer.parseInt(idLector);
+		int idPre= Integer.parseInt(idPrestamo);
+		System.err.println(idLec+" "+idPre);
+		Lector lector = lectorRepository.findById(idLec).get();
 		if (!lector.getLstPrestamos().isEmpty()) {
-			Prestamo prestamo = prestamoService.get(idPrestamo);
+			Prestamo prestamo = prestamoService.get(idPre);
 			if(LocalDate.now().isAfter(prestamo.getFin())) {
 				int dias =prestamo.getFin().datesUntil(LocalDate.now()).collect(Collectors.toList()).size();
-				multar(idLector, dias);
+				multar(idLec, dias);
 			}
-			lector.getLstPrestamos().remove(prestamo);
+			List<Prestamo> lstAux=lector.getLstPrestamos();
+			System.err.println(lstAux.toString());
+			lstAux.remove(prestamo);
+			System.err.println(lstAux.toString());
+			lector.setLstPrestamos(lstAux);
 			Copia copia=prestamo.getCopia();
 			copiaService.update(copia.getId(), 1);
 			lectorRepository.save(lector);
-			prestamoService.delete(idPrestamo);
+			prestamoService.bajaLogica(idPre);
 		} else {
 			throw new RuntimeException("no hay prestamos asociados a este lector");
 		}
 		return 0;
+	}
+
+	@Override
+	public void bajaLogica(int id) {
+		Lector lector=lectorRepository.findById(id).get();
+		lector.setActivo(false);
+		lectorRepository.save(lector);
+	}
+
+	@Override
+	public List<Lector> lectoresActivos() {
+		List<Lector> lectores=lectorRepository.findAll().stream().filter(l -> l.isActivo()).collect(Collectors.toList());
+		return lectores;
+	}
+	
+	public List<Lector> lectoresConPrestamos(){
+		List<Lector> lectores=lectorRepository.findAll().stream().filter(l -> l.getLstPrestamos().size()>0 && l.isActivo()).collect(Collectors.toList());
+		return lectores;
 	}
 
 }

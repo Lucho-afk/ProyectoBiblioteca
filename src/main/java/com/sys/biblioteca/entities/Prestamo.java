@@ -36,14 +36,18 @@ public class Prestamo {
 	private LocalDate fin;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "lector_id", referencedColumnName = "id", columnDefinition = "int")
+	@JoinColumn(name = "lector_id", referencedColumnName = "id", columnDefinition = "int", nullable = true)
 	@JsonIgnore
 	Lector lector;
 
 	@OneToOne()
-	@JoinColumn(name = "copia_id")
+	@JoinColumn(name = "copia_id", nullable = true)
 	Copia copia;
 
+	@Column
+	@JsonIgnore
+	private boolean activo;
+	
 	public int getId() {
 		return id;
 	}
@@ -90,6 +94,13 @@ public class Prestamo {
 				+ "]";
 	}
 
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}	
 	
 	
 }

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lectores</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link th:href="@{/css/styles.css}" rel="stylesheet" />
+  </head>
+  <body class="body__all">
+    <header>
+      <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Biblioteca</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" th:href="@{/libros/home}">Libros</a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  th:href="@{/lector/home}"
+                  >Lectores</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" th:href="@{/prestamo/home}">Prestamos</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <div class="container">
+        <a href="" class="btn btn-outline-primary" th:href="@{/lector/agregar}"
+          >agregar</a
+        >
+        <div class="row">
+          <div class="col align-content-lg-center">
+            <table
+              class="table table-dark table-bordered table-striped"
+              style="border-radius: 12px"
+            >
+              <thead class="thead-dark">
+                <th>Nombre</th>
+                <th>Telefono</th>
+                <th>Direccion</th>
+                <th style="display: flex; justify-content: center">
+                  Operaciones
+                </th>
+              </thead>
+              <tbody th:each="l : ${lector}">
+                <tr>
+                  <td th:text="${l.nombre}"></td>
+                  <td th:text="${l.telefono}"></td>
+                  <td th:text="${l.direccion}"></td>
+                  <td>
+                    <div style="display: flex; justify-content: space-around">
+                      <a
+                        href=""
+                        class="btn btn-outline-success"
+                        th:href="@{/lector/modificar/{id}(id=${l.id})}"
+                        >actualizar</a
+                      ><a
+                        class="btn btn-outline-danger"
+                        th:href="@{/lector/borrar/{id}(id=${l.id})}"
+                        >eliminar</a
+                      >
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer></footer>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

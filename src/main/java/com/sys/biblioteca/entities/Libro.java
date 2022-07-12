@@ -9,10 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "libros")
@@ -26,9 +26,8 @@ public class Libro {
 	@Column(nullable = false)
 	private String titulo;
 
-	@OneToOne
-	@JoinColumn(name = "genero_id")
-	private Genero genero;
+	@Column
+	private String genero;
 
 	@Column
 	private String editorial;
@@ -48,6 +47,10 @@ public class Libro {
 	@OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
 	private Set<Copia> lstCopias = new HashSet<Copia>();
 
+	@Column
+	@JsonIgnore
+	private boolean activo;
+	
 	public int getId() {
 		return id;
 	}
@@ -88,11 +91,11 @@ public class Libro {
 		this.titulo = titulo;
 	}
 
-	public Genero getGenero() {
+	public String getGenero() {
 		return genero;
 	}
 
-	public void setGenero(Genero genero) {
+	public void setGenero(String genero) {
 		this.genero = genero;
 	}
 
@@ -112,6 +115,7 @@ public class Libro {
 		this.anio = anio;
 	}
 
+
 	public Set<Copia> getLstCopias() {
 		return lstCopias;
 	}
@@ -120,4 +124,13 @@ public class Libro {
 		this.lstCopias = lstCopias;
 	}
 
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
+
+	
 }

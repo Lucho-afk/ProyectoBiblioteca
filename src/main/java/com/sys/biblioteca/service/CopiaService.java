@@ -13,4 +13,5 @@ public interface CopiaService extends GenericService<Copia, Integer>{
 	public int add(int id);
 	public void update(int id, int idStatus);
 	public List<String> mostarPorPantalla(int idCopia);
+	public List<String> statusCopia(int idLibro);
 }

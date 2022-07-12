@@ -1,17 +1,18 @@
 package com.sys.biblioteca.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.servlet.ModelAndView;
 import com.sys.biblioteca.entities.Lector;
 import com.sys.biblioteca.service.LectorService;
 
@@ -26,44 +27,58 @@ public class LectorController {
 	public List<Lector> getAll() {
 		return lectorService.getall();
 	}
-	
+
 	@GetMapping(path = "/{id}")
-	public Lector getById(@PathVariable("id")int id) {
+	public Lector getById(@PathVariable("id") int id) {
 		return lectorService.get(id);
 	}
 
-	@PostMapping
-	public int add(@RequestBody Lector lector) {
-		return lectorService.save(lector).getId();
+	@RequestMapping(value = "/guardarLector", method = RequestMethod.POST)//lector/guardarLector
+	public ModelAndView guardarLector(@ModelAttribute Lector lector) {
+		lector.setActivo(true);
+		lectorService.save(lector);
+		return new ModelAndView("redirect:/lector/home");
 	}
 
-	@DeleteMapping(path = "/{id}")
-	public void delete(@PathVariable("id") int id) {
-		lectorService.delete(id);
+	@GetMapping("/home")//lector/home
+	public ModelAndView mostrarLectores() {
+		ModelAndView mav = new ModelAndView("Lectores");
+		List<Lector> listas = lectorService.lectoresActivos();
+		mav.addObject("lector", listas);
+		return mav;
+	}
+
+	@RequestMapping(value = "/agregar", method = RequestMethod.GET)//lector/agregar
+	public ModelAndView agregar() {
+		ModelAndView mav = new ModelAndView("crearLectorFrm");
+		Lector lector = new Lector();
+		mav.addObject("lector", lector);
+		return mav;
 	}
 	
-	@PutMapping(path="/{id}")
-	public int update(@RequestBody Lector lector, @PathVariable("id") int id) {
-		return this.lectorService.update(lector, id).getId();
+	@PutMapping(path="/actualizar")//lector/actualizar
+	public ModelAndView update(@ModelAttribute Lector lector) {
+		lectorService.save(lector);
+		return new ModelAndView("redirect:/lector/home");
 	}
 	
-	@PostMapping(path="/{id}/{dias}")//controller temporal
-	public void multar(@PathVariable("id") int id, @PathVariable("dias") int dias) {
-		this.lectorService.multar(id, dias);
+	@RequestMapping(value = "/modificar/{id}", method = RequestMethod.GET)//lector/modificar -- cuando esta multado no puede actualizar
+	public ModelAndView update(@PathVariable int id) {
+		ModelAndView mav = new ModelAndView("actualizarLectorForm");
+		Lector lector = lectorService.get(id);
+		mav.addObject("lector", lector);
+		return mav;
 	}
 	
-	@PostMapping(path="/multa/{id}")//controller temporal
-	public boolean desmultar(@PathVariable("id") int id) {
-		return this.lectorService.verificarMulta(id);
+	@GetMapping(path = "borrar/{id}")
+	public ModelAndView delete(@PathVariable("id") int id) {
+		lectorService.bajaLogica(id);
+		return new ModelAndView("redirect:/lector/home");
 	}
 	
-	@PostMapping(path = "/prestar/{idLector}/{idLibro}")
-	public void prestar(@PathVariable("idLector") int idLector, @PathVariable("idLibro") int idLibro){
-		this.lectorService.prestar(idLector, idLibro);
+	@PostMapping(path="/prestar/{id}/{id2}")//metodo para probar prestamos
+	public void prestamoTemporal(@PathVariable("id") int id, @PathVariable("id2") int id2) {
+		lectorService.prestar(id, id2);
 	}
 	
-	@DeleteMapping(path = "/borrar/{idLector}/{idPrestamo}")
-	public void borrar(@PathVariable("idLector") int idLector, @PathVariable("idPrestamo") int idPrestamo) {
-		this.lectorService.devolver(idLector, idPrestamo);
-	}
 }

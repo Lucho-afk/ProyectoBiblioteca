@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "multas")
 public class Multa {
@@ -24,6 +26,10 @@ public class Multa {
 	@Column
 	private LocalDate fechaFinal;
 
+	@Column
+	@JsonIgnore
+	private boolean activo;
+	
 	public int getId() {
 		return id;
 	}
@@ -48,4 +54,12 @@ public class Multa {
 		this.fechaFinal = fechaFinal;
 	}
 
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
+	
 }
