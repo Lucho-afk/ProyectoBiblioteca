@@ -29,8 +29,7 @@
 						<li class="nav-item"><a class="nav-link"
 							th:href="@{/lector/home}">Lectores</a></li>
 						<li class="nav-item"><a class="nav-link active"
-							aria-current="page" th:href="@{/prestamo/home}">Prestamos</a>
-						</li>
+							aria-current="page" th:href="@{/prestamo/home}">Prestamos</a></li>
 					</ul>
 				</div>
 			</div>
@@ -46,20 +45,20 @@
 						style="border-radius: 12px">
 						<thead class="thead-dark">
 							<th>Lector asociado</th>
-							<th>Copia pretada</th>
+							<th>Titulo</th>
+							<th>Fecha inicial</th>
+							<th>Fecha caducidad</th>
+							<th style="text-align: center;">operacion</th>
 						</thead>
-						<tbody>
-							<tr th:each="l : ${lectores}">
+						<tbody th:each="l : ${lectores}">
+							<tr th:each="pre : ${l.lstPrestamos}">
 								<td th:text="${l.nombre}"></td>
-								<td>
-									<p th:each="pre : ${l.lstPrestamos}">
-										Titulo: <span th:text="${pre.copia.getLibro().getTitulo()}"></span>
-										// Fecha inical del prestamo:<span th:text="${pre.inicio}"></span>
-										// Caduca:<span th:text="${pre.fin}"></span>
-										<a type="button" class="btn btn-outline-success" 
-										th:href="@{'/prestamo/devolver/' + ${pre.lector.getId()} +'/'+${pre.id}}" >devolver</a>
-									</p>
-								</td>
+								<td th:text="${pre.copia.getLibro().getTitulo()}"></td>
+								<td th:text="${pre.inicio}"></td>
+								<td th:text="${pre.fin}"></td>
+								<td style="text-align: center;"><a type="button"
+									class="btn btn-outline-success"
+									th:href="@{'/prestamo/devolver/' + ${pre.lector.getId()} +'/'+${pre.id}}">devolver</a></td>
 							</tr>
 						</tbody>
 					</table>

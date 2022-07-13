@@ -12,7 +12,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
 @Entity
 @Table(name = "copias")
 public class Copia {
@@ -22,7 +21,6 @@ public class Copia {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	
 	@OneToOne
 	@JoinColumn(name = "status_id")
 	private Status status;
@@ -31,7 +29,7 @@ public class Copia {
 	@JoinColumn(name = "libro_id", referencedColumnName = "id", columnDefinition = "int", nullable = true)
 	@JsonIgnore
 	private Libro libro;
-	
+
 	@Column
 	@JsonIgnore
 	private boolean activo;
@@ -60,11 +58,6 @@ public class Copia {
 		this.libro = libro;
 	}
 
-	@Override
-	public String toString() {
-		return "Copia [id=" + id + ", status=" + status + ", libro=" + libro + "]";
-	}
-
 	public boolean isActivo() {
 		return activo;
 	}
@@ -72,7 +65,5 @@ public class Copia {
 	public void setActivo(boolean activo) {
 		this.activo = activo;
 	}
-	
-	
 
 }

@@ -29,7 +29,7 @@ public class Multa {
 	@Column
 	@JsonIgnore
 	private boolean activo;
-	
+
 	public int getId() {
 		return id;
 	}
@@ -61,5 +61,5 @@ public class Multa {
 	public void setActivo(boolean activo) {
 		this.activo = activo;
 	}
-	
+
 }

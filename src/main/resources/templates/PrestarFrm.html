@@ -11,7 +11,7 @@
 	crossorigin="anonymous" />
 <link th:href="@{/css/styles.css}" rel="stylesheet" />
 </head>
-<body>
+<body class="body__all">
 	<header>
 		<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
 			<div class="container-fluid">
@@ -26,10 +26,10 @@
 					<ul class="navbar-nav">
 						<li class="nav-item"><a class="nav-link"
 							th:href="@{/libros/home}">Libros</a></li>
-						<li class="nav-item"><a class="nav-link active"
-							aria-current="page" th:href="@{home}">Lectores</a></li>
 						<li class="nav-item"><a class="nav-link"
-							th:href="@{/prestamo/home}">Prestamos</a></li>
+							th:href="@{/lector/home}">Lectores</a></li>
+						<li class="nav-item"><a class="nav-link active"
+							aria-current="page" th:href="@{/prestamo/home}">Prestamos</a></li>
 					</ul>
 				</div>
 			</div>
@@ -39,6 +39,12 @@
 		<div class="card">
 			<div class="card-header">
 				<h2>Crear Prestamo</h2>
+				<div>
+					<div th:unless="${#strings.isEmpty(msg)}"
+						class=" alert 
+						alert-danger display-6" role="alert"
+						th:text="${msg.toUpperCase()}" style="text-align: center"></div>
+				</div>
 			</div>
 			<div class="card-body">
 				<form th:action="@{/prestamo/prestar}" th:object="${duoutil}"
@@ -46,8 +52,8 @@
 					<div class="form-group row">
 						<label class="col-md-1" for="lector">Lector</label><select
 							th:field="*{lector}" class="form-control col" id="lector">
-							<option th:each="leo:${nombre_generico_para_lectores}" th:value="${leo.id}"
-								th:text="${leo.nombre}">
+							<option th:each="leo:${nombre_generico_para_lectores}"
+								th:value="${leo.id}" th:text="${leo.nombre}">
 						</select>
 					</div>
 					<div class="form-group row">
@@ -60,7 +66,6 @@
 					<button class="btn btn-primary" type="submit">Agregar</button>
 				</form>
 			</div>
-
 		</div>
 
 	</main>

@@ -1,4 +1,5 @@
 package com.sys.biblioteca.entities;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 @Entity
 @Table(name = "lectores")
@@ -33,9 +33,9 @@ public class Lector {
 
 	@Column
 	private String direccion;
-	
+
 	@OneToOne
-	@JoinColumn(name="multa_id", nullable = true, unique = false)
+	@JoinColumn(name = "multa_id", nullable = true, unique = false)
 	private Multa multa;
 
 	@Column
@@ -44,9 +44,7 @@ public class Lector {
 
 	@OneToMany(mappedBy = "lector", cascade = CascadeType.ALL)
 	List<Prestamo> lstPrestamos = new ArrayList<>();
-	
-	
-	
+
 	public List<Prestamo> getLstPrestamos() {
 		return lstPrestamos;
 	}
@@ -102,6 +100,4 @@ public class Lector {
 	public void setActivo(boolean activo) {
 		this.activo = activo;
 	}
-
-	
 }

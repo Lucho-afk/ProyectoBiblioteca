@@ -6,7 +6,6 @@ import com.sys.biblioteca.entities.Libro;
 public class DuoUtil {
 
 	private Lector lector;
-
 	private Libro libro;
 
 	public Lector getLector() {

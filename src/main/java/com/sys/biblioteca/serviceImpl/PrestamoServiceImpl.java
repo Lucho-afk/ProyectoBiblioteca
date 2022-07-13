@@ -2,12 +2,9 @@ package com.sys.biblioteca.serviceImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
-import com.sys.biblioteca.entities.Lector;
 import com.sys.biblioteca.entities.Prestamo;
 import com.sys.biblioteca.genericsABM.GenericServiceImpl;
 import com.sys.biblioteca.repository.PrestamoRepository;

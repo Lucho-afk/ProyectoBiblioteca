@@ -2,6 +2,7 @@ package com.sys.biblioteca.controller;
 
 import java.util.List;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sys.biblioteca.entities.Copia;
 import com.sys.biblioteca.entities.Lector;
@@ -26,10 +28,10 @@ public class PrestamoController {
 
 	@Autowired
 	PrestamoService prestamoService;
-	
+
 	@Autowired
 	LectorService lectorService;
-	
+
 	@Autowired
 	LibroService libroService;
 
@@ -42,41 +44,47 @@ public class PrestamoController {
 	public Prestamo getById(@PathVariable("id") int id) {
 		return prestamoService.get(id);
 	}
-	
-	@PostMapping(path = "/{idLector}/{idLibro}")//prueba agregar prestamos
-	public int add(@PathVariable("idLector") int idLector, @PathVariable("idLibro") int idLibro){
+
+	@PostMapping(path = "/{idLector}/{idLibro}")
+	public int add(@PathVariable("idLector") int idLector, @PathVariable("idLibro") int idLibro) {
 		return prestamoService.save(null).getId();
 	}
-	
-	@GetMapping(path="/agregarPrestamo")
+
+	@GetMapping(path = "/agregarPrestamo")
 	public ModelAndView prestar() {
 		ModelAndView mav = new ModelAndView("PrestarFrm");
-		List<Lector> listaLectores= lectorService.lectoresActivos();
-		List<Libro> listaLibros= libroService.librosActivos();
+		List<Lector> listaLectores = lectorService.lectoresActivos();
+		List<Libro> listaLibros = libroService.librosActivos();
 		mav.addObject("nombre_generico_para_lectores", listaLectores);
 		mav.addObject("libros", listaLibros);
 		mav.addObject("duoutil", new DuoUtil());
 		return mav;
 	}
-	
-	@GetMapping(path="/home")
+
+	@GetMapping(path = "/home")
 	public ModelAndView home() {
 		ModelAndView mav = new ModelAndView("Prestamos");
 		List<Lector> lista = lectorService.lectoresConPrestamos();
 		mav.addObject("lectores", lista);
 		return mav;
 	}
-	
-	@PostMapping(path="/prestar")
-	public ModelAndView crearPrestamo(@ModelAttribute DuoUtil duo) {
-		lectorService.prestar(duo.getLector().getId(), duo.getLibro().getId());
-		return new ModelAndView("redirect:/prestamo/home");
+
+	@PostMapping(path = "/prestar")
+	public ModelAndView crearPrestamo(@ModelAttribute DuoUtil duo, RedirectAttributes redirAttrs) {
+		ModelAndView mav = new ModelAndView();
+		try {
+			lectorService.prestar(duo.getLector().getId(), duo.getLibro().getId());
+			mav = new ModelAndView("redirect:/prestamo/home");
+		} catch (RuntimeException e) {
+			mav = new ModelAndView("redirect:/prestamo/agregarPrestamo");
+			redirAttrs.addFlashAttribute("msg", e.getMessage());
+		}
+		return mav;
 	}
-	
+
 	@GetMapping(path = "/devolver/{idL}/{idP}")
-	public ModelAndView devolver(@PathVariable ("idL") String idLector, @PathVariable("idP") String idPrestamo) {
+	public ModelAndView devolver(@PathVariable("idL") String idLector, @PathVariable("idP") String idPrestamo) {
 		lectorService.devolver(idLector, idPrestamo);
 		return new ModelAndView("redirect:/prestamo/home");
 	}
-	
 }

@@ -1,9 +1,9 @@
 package com.sys.biblioteca.serviceImpl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,13 +60,7 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 		} else {
 			throw new RuntimeException("ID NO ENCONTRADO:" + id);
 		}
-
 	}
-
-//
-//agrega = dias * 2, por cada dia de retraso en la entrega pactada 
-//en caso de tener multa previa agrega los dias a la multa que tengas(se usaria en caso de devolver 1 de los 3 libros permitidos)
-//
 
 	@Override
 	public void multar(int id, int dias) {
@@ -90,14 +84,8 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 		}
 	}
 
-//	
-//	  En la siguiente metodo se implementaron 2 modulos 
-//	  --verificarMulta referente a LectorService 
-//	  --verificarCopiasDisponibles referente a LibrosServiceImpl
-//
 	@Override
 	public void prestar(int idLector, int idLibro) {
-
 		Optional<Lector> optionalAux = lectorRepository.findById(idLector);
 		if (optionalAux.isPresent()) {
 			Lector lector = optionalAux.get();
@@ -105,46 +93,28 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 				if (libroService.verificarCopiasDisponibles(idLibro)) {
 					add(idLector, idLibro);
 				} else {
-					throw new RuntimeException("el libro no tiene copias disponibles");// lo voy a tirar en alerts en el
-																						// front
+					throw new RuntimeException("El libro no tiene copias disponibles");
 				}
 			} else {
-				throw new RuntimeException("este lector esta multado");
+				throw new RuntimeException("Este lector esta multado");
 			}
 		} else {
 			throw new RuntimeException("id invalido");
 		}
 	}
 
-//
-//	devuelve FALSE si la multa esta activa
-//	devuelve TRUE si la multa ya expiro
-//
 	@Override
 	public boolean verificarMulta(int id) {
 		Lector aux = lectorRepository.findById(id).get();
 		if (aux.getMulta() != null) {
 			if (aux.getMulta().getFechaFinal().isBefore(LocalDate.now())) {
 				aux.setMulta(null);
-				
 				lectorRepository.save(aux);
 			}
 		}
 		return (aux.getMulta() == null);
 	}
 
-// necesito el id del lector, del libro V
-// necesito validar que el lector no tenga mas de 3 prestamos V
-// necesito traer la cantidad disponible de copias V
-// necesito agarrar una de esas copias y hacerle un update que pase a prestado V
-// necesito obtener el prestamo asociado al lector // en caso de que no tenga necesito crear uno V
-// necesito persistir ese prestamo v
-// necesito a esa lista de prestamo agregarle el prestamo v
-// necesito setear al lector en prestamo v
-// necesito agregar ese prestamo al lector v
-// necesito persistir al lector v
-// lector -> prestamo v
-// en el momento que hice este codigo solo dios y yo sabiamos que hacia ahora solo dios lo sabe... suerte.
 	@Override
 	public Prestamo add(int idLector, int idLibro) {
 		Lector lector = lectorRepository.findById(idLector).get();
@@ -153,7 +123,9 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 		prestamoNuevo.setActivo(true);
 		prestamoNuevo.setInicio(LocalDate.now());
 		prestamoNuevo.setFin(LocalDate.now().plusDays(30));
-		if (lector.getLstPrestamos().size() < 3) {
+		List<Prestamo> lstActivaDePrestamos = lector.getLstPrestamos().stream().filter(p -> p.isActivo())
+				.collect(Collectors.toList());
+		if (lstActivaDePrestamos.size() < 3) {
 			Copia copia = libro.getLstCopias().stream().filter(obj -> obj.getStatus().getEstado().equals("disponible"))
 					.collect(Collectors.toList()).get(0);
 			copiaService.update(copia.getId(), 2);
@@ -163,32 +135,28 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 			Prestamo aux = prestamoService.save(prestamoNuevo);
 			listaPrestamoAUX.add(aux);
 			lector.setLstPrestamos(listaPrestamoAUX);
-			System.err.println(lector.getLstPrestamos().toString());
 			lectorRepository.save(lector);
 		} else {
-			throw new RuntimeException("el lector tiene mas de 3 prestamos");
+			throw new RuntimeException("El lector tiene mas de 3 prestamos");
 		}
 		return null;
 	}
 
 	@Override
 	public int devolver(String idLector, String idPrestamo) {
-		int idLec= Integer.parseInt(idLector);
-		int idPre= Integer.parseInt(idPrestamo);
-		System.err.println(idLec+" "+idPre);
+		int idLec = Integer.parseInt(idLector);
+		int idPre = Integer.parseInt(idPrestamo);
 		Lector lector = lectorRepository.findById(idLec).get();
 		if (!lector.getLstPrestamos().isEmpty()) {
 			Prestamo prestamo = prestamoService.get(idPre);
-			if(LocalDate.now().isAfter(prestamo.getFin())) {
-				int dias =prestamo.getFin().datesUntil(LocalDate.now()).collect(Collectors.toList()).size();
+			if (LocalDate.now().isAfter(prestamo.getFin())) {
+				int dias = prestamo.getFin().datesUntil(LocalDate.now()).collect(Collectors.toList()).size();
 				multar(idLec, dias);
 			}
-			List<Prestamo> lstAux=lector.getLstPrestamos();
-			System.err.println(lstAux.toString());
+			List<Prestamo> lstAux = lector.getLstPrestamos();
 			lstAux.remove(prestamo);
-			System.err.println(lstAux.toString());
 			lector.setLstPrestamos(lstAux);
-			Copia copia=prestamo.getCopia();
+			Copia copia = prestamo.getCopia();
 			copiaService.update(copia.getId(), 1);
 			lectorRepository.save(lector);
 			prestamoService.bajaLogica(idPre);
@@ -200,20 +168,35 @@ public class LectorServiceImpl extends GenericServiceImpl<Lector, Integer> imple
 
 	@Override
 	public void bajaLogica(int id) {
-		Lector lector=lectorRepository.findById(id).get();
+		Lector lector = lectorRepository.findById(id).get();
 		lector.setActivo(false);
 		lectorRepository.save(lector);
 	}
 
 	@Override
 	public List<Lector> lectoresActivos() {
-		List<Lector> lectores=lectorRepository.findAll().stream().filter(l -> l.isActivo()).collect(Collectors.toList());
-		return lectores;
-	}
-	
-	public List<Lector> lectoresConPrestamos(){
-		List<Lector> lectores=lectorRepository.findAll().stream().filter(l -> l.getLstPrestamos().size()>0 && l.isActivo()).collect(Collectors.toList());
+		List<Lector> lectores = lectorRepository.findAll().stream().filter(l -> l.isActivo())
+				.collect(Collectors.toList());
 		return lectores;
 	}
 
+	public List<Lector> lectoresConPrestamos() {
+		List<Prestamo> prestamos = new ArrayList<>();
+		List<Lector> aux = new ArrayList<>();
+		List<Lector> lectores = lectorRepository.findAll().stream()
+				.filter(l -> l.getLstPrestamos().size() > 0 && l.isActivo()).collect(Collectors.toList());
+		for (Lector l : lectores) {
+			Lector auxLector = new Lector();
+			for (Prestamo p : l.getLstPrestamos()) {
+				if (p.isActivo()) {
+					prestamos.add(p);
+				}
+			}
+			auxLector = l;
+			auxLector.setLstPrestamos(prestamos);
+			aux.add(auxLector);
+			prestamos = new ArrayList<>();
+		}
+		return aux.stream().filter(l -> l.getLstPrestamos().size() > 0 && l.isActivo()).collect(Collectors.toList());
+	}
 }

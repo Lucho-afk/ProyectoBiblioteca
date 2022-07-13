@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public abstract class GenericServiceImpl<T, ID extends Serializable> implements GenericService<T, ID> {
@@ -24,16 +22,16 @@ public abstract class GenericServiceImpl<T, ID extends Serializable> implements 
 	}
 
 	@Override
-	public T get(ID id) {// deprecaron el getById de jpaRepository y no lo sabia
+	public T get(ID id) {
 		Optional<T> obj = getRepository().findById(id);
-		T aux=null;
+		T aux = null;
 		if (obj.isPresent()) {
-			aux =obj.get();
-		}else {
-			throw new RuntimeException("id inexistente: "+id);
+			aux = obj.get();
+		} else {
+			throw new RuntimeException("id inexistente: " + id);
 		}
 		return aux;
-		
+
 	}
 
 	@Override

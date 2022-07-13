@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import com.sys.biblioteca.entities.Copia;
 import com.sys.biblioteca.entities.Libro;
@@ -19,6 +16,7 @@ import com.sys.biblioteca.repository.CopiaRepository;
 import com.sys.biblioteca.service.CopiaService;
 import com.sys.biblioteca.service.LibroService;
 import com.sys.biblioteca.service.StatusService;
+import com.sys.biblioteca.utils.EstadosUtil;
 
 @Service
 public class CopiaServiceImpl extends GenericServiceImpl<Copia, Integer> implements CopiaService {
@@ -43,7 +41,6 @@ public class CopiaServiceImpl extends GenericServiceImpl<Copia, Integer> impleme
 
 	@Override
 	public JpaRepository<Copia, Integer> getRepository() {
-		// TODO Auto-generated method stub
 		return copiaRepository;
 	}
 
@@ -99,4 +96,20 @@ public class CopiaServiceImpl extends GenericServiceImpl<Copia, Integer> impleme
 		return rta;
 	}
 
+	@Override
+	public List<EstadosUtil> verEstatus(List<Libro> lbs) {
+		List<EstadosUtil> aux= new ArrayList<>();
+		for(Libro l: lbs) {
+			int disponible=0;
+			int prestado=0;
+			int retrasado=0;
+			int reparacion=0;
+			disponible= l.getLstCopias().stream().filter(c -> c.getStatus().getId()==1).collect(Collectors.toList()).size();
+			prestado= l.getLstCopias().stream().filter(c -> c.getStatus().getId()==2).collect(Collectors.toList()).size();
+			retrasado= l.getLstCopias().stream().filter(c -> c.getStatus().getId()==3).collect(Collectors.toList()).size();
+			reparacion= l.getLstCopias().stream().filter(c -> c.getStatus().getId()==4).collect(Collectors.toList()).size();
+			aux.add(new EstadosUtil(disponible,prestado,retrasado,reparacion));
+		}
+		return aux;
+	}	
 }

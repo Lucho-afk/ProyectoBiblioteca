@@ -33,14 +33,14 @@ public class LectorController {
 		return lectorService.get(id);
 	}
 
-	@RequestMapping(value = "/guardarLector", method = RequestMethod.POST)//lector/guardarLector
+	@RequestMapping(value = "/guardarLector", method = RequestMethod.POST)
 	public ModelAndView guardarLector(@ModelAttribute Lector lector) {
 		lector.setActivo(true);
 		lectorService.save(lector);
 		return new ModelAndView("redirect:/lector/home");
 	}
 
-	@GetMapping("/home")//lector/home
+	@GetMapping("/home")
 	public ModelAndView mostrarLectores() {
 		ModelAndView mav = new ModelAndView("Lectores");
 		List<Lector> listas = lectorService.lectoresActivos();
@@ -48,37 +48,32 @@ public class LectorController {
 		return mav;
 	}
 
-	@RequestMapping(value = "/agregar", method = RequestMethod.GET)//lector/agregar
+	@RequestMapping(value = "/agregar", method = RequestMethod.GET)
 	public ModelAndView agregar() {
 		ModelAndView mav = new ModelAndView("crearLectorFrm");
 		Lector lector = new Lector();
 		mav.addObject("lector", lector);
 		return mav;
 	}
-	
-	@PutMapping(path="/actualizar")//lector/actualizar
+
+	@PutMapping(path = "/actualizar")
 	public ModelAndView update(@ModelAttribute Lector lector) {
 		lectorService.save(lector);
 		return new ModelAndView("redirect:/lector/home");
 	}
-	
-	@RequestMapping(value = "/modificar/{id}", method = RequestMethod.GET)//lector/modificar -- cuando esta multado no puede actualizar
+
+	@RequestMapping(value = "/modificar/{id}", method = RequestMethod.GET)
 	public ModelAndView update(@PathVariable int id) {
 		ModelAndView mav = new ModelAndView("actualizarLectorForm");
 		Lector lector = lectorService.get(id);
 		mav.addObject("lector", lector);
 		return mav;
 	}
-	
+
 	@GetMapping(path = "borrar/{id}")
 	public ModelAndView delete(@PathVariable("id") int id) {
 		lectorService.bajaLogica(id);
 		return new ModelAndView("redirect:/lector/home");
 	}
-	
-	@PostMapping(path="/prestar/{id}/{id2}")//metodo para probar prestamos
-	public void prestamoTemporal(@PathVariable("id") int id, @PathVariable("id2") int id2) {
-		lectorService.prestar(id, id2);
-	}
-	
+
 }

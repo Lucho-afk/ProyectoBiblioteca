@@ -50,7 +50,7 @@ public class Libro {
 	@Column
 	@JsonIgnore
 	private boolean activo;
-	
+
 	public int getId() {
 		return id;
 	}
@@ -115,7 +115,6 @@ public class Libro {
 		this.anio = anio;
 	}
 
-
 	public Set<Copia> getLstCopias() {
 		return lstCopias;
 	}
@@ -132,5 +131,4 @@ public class Libro {
 		this.activo = activo;
 	}
 
-	
 }
